@@ -1294,7 +1294,8 @@ class gcalcli:
 
         if self.detailEnd and not allDay:
             _, tempTimeStr = _formatTime(event['e'])
-            PrintMsg(CLR_NRM(), "%s  End: %s\n" % (detailsIndent, tempTimeStr))
+            PrintMsg(CLR_NRM(), "%s  End: %s %s\n" % (
+                detailsIndent, event['e'].strftime('%Y-%m-%d'), tempTimeStr))
 
         if self.detailReminders and 'reminders' in event:
             if event['reminders']['useDefault'] is True:

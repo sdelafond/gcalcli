@@ -1895,6 +1895,72 @@ class gcalcli:
 
             message += '%s  %s\n' % \
                        (tmpTimeStr, self._ValidTitle(event).strip())
+            if self.detailCalendar:
+                message += 'Calendar: %s\n' % event['gcalcli_cal']['summary']
+
+            if self.detailUrl and 'htmlLink' in event:
+                message += 'Link: %s\n' % self._ShortenURL(event['htmlLink'])
+
+            if self.detailUrl and 'hangoutLink' in event:
+                message += 'Hangout: %s\n' % self._ShortenURL(event['hangoutLink'])
+
+            if self.detailLocation and \
+               'location' in event and \
+               event['location'].strip():
+                message += 'Location: %s\n' % event['location'].strip()
+
+            if self.detailAttendees and 'attendees' in event:
+                attendees = []
+                if 'self' not in event['organizer']:
+                    attendees.add("%s: <%s>" % (
+                        event['organizer'].get('displayName', 'Not Provided')
+                                          .strip(),
+                        event['organizer'].get('email', 'Not Provided').strip()
+                    ))
+
+                for attendee in event['attendees']:
+                    if 'self' not in attendee:
+                        attendees.add("%s: <%s>" % (
+                            attendee.get('displayName', 'Not Provided').strip(),
+                            attendee.get('email', 'Not Provided').strip()
+                        ))
+
+                if attendees:
+                    message += "Attendees: %s\n" % ", ".join(attendees)
+
+            if self.detailAttachments and 'attachments' in event:
+                attachments = []
+                for attachment in event['attachments']:
+                    attachments.add("%s (%s)\n" % (
+                        attendee.get('title', 'Not Provided').strip(),
+                        attendee.get('fileUrl', 'Not Provided').strip()
+                    ))
+                if attachments:
+                    message += "Attachments: %s\n" % ", ".join(attachments)
+
+            if self.detailLength:
+                diffDateTime = (event['e'] - event['s'])
+                message += 'Length: %s\n' % diffDateTime
+
+            if self.detailReminders and 'reminders' in event:
+                if event['reminders']['useDefault'] is True:
+                    message += "Reminder: (default)\n"
+                elif 'overrides' in event['reminders']:
+                    reminders = []
+                    for rem in event['reminders']['overrides']:
+                        reminders.add("%s %d minutes" % (rem['method'], rem['minutes']))
+                    if reminders:
+                        message += "Reminder: %s\n" % ", ".join(reminders)
+
+            if self.detailEmail and \
+               'email' in event['creator'] and \
+               event['creator']['email'].strip():
+                message += 'Email: %s\n' % event['creator']['email'].strip()
+
+            if self.detailDescr and \
+               'description' in event and \
+               event['description'].strip():
+                message += 'Description: %s\n' % event['description'].strip()
 
         if not message:
             return
@@ -2296,7 +2362,7 @@ _import.add_argument("file", type=argparse.FileType('r'), nargs="?")
 _import.add_argument("--verbose", "-v", action="count", help="Be verbose on imports")
 _import.add_argument("--dump", "-d", action="store_true", help="Print events and don't import")
 
-remind = sub.add_parser("remind")
+remind = sub.add_parser("remind", parents=[detailsParser])
 remind.add_argument("minutes", type=int)
 remind.add_argument("cmd", type=str)
 remind.add_argument("--use_reminders", action="store_true", help="Honour the remind time when running remind command")

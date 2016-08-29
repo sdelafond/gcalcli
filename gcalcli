@@ -564,6 +564,7 @@ class gcalcli:
         self.detailCalendar = hasDetail('calendar')
         self.detailLocation = hasDetail('location')
         self.detailLength = hasDetail('length')
+        self.detailEnd = hasDetail('end')
         self.detailReminders = hasDetail('reminders')
         self.detailDescr = hasDetail('description')
         self.detailDescrWidth = hasOption('width', 80)
@@ -1171,6 +1172,13 @@ class gcalcli:
 
     def _PrintEvent(self, event, prefix):
 
+        def _formatTime(dt, rjust=0):
+            if self.military:
+                return ('%-5s', dt.strftime("%H:%M"))
+            else:
+                return ('%-7s', dt.strftime("%I:%M").lstrip('0').rjust(rjust) +
+                        dt.strftime('%p').lower())
+
         def _formatDescr(descr, indent, box):
             wrapper = textwrap.TextWrapper()
             if box:
@@ -1200,14 +1208,7 @@ class gcalcli:
         indent = 10 * ' '
         detailsIndent = 19 * ' '
 
-        if self.military:
-            timeFormat = '%-5s'
-            tmpTimeStr = event['s'].strftime("%H:%M")
-        else:
-            timeFormat = '%-7s'
-            tmpTimeStr = \
-                event['s'].strftime("%I:%M").lstrip('0').rjust(5) + \
-                event['s'].strftime('%p').lower()
+        timeFormat, tmpTimeStr = _formatTime(event['s'], rjust=5)
 
         if not prefix:
             prefix = indent
@@ -1286,10 +1287,14 @@ class gcalcli:
                 )
                 PrintMsg(CLR_NRM(), xstr)
 
-        if self.detailLength:
+        if self.detailLength and not allDay:
             diffDateTime = (event['e'] - event['s'])
             xstr = "%s  Length: %s\n" % (detailsIndent, diffDateTime)
             PrintMsg(CLR_NRM(), xstr)
+
+        if self.detailEnd and not allDay:
+            _, tempTimeStr = _formatTime(event['e'])
+            PrintMsg(CLR_NRM(), "%s  End: %s\n" % (detailsIndent, tempTimeStr))
 
         if self.detailReminders and 'reminders' in event:
             if event['reminders']['useDefault'] is True:
@@ -2204,7 +2209,8 @@ detailsParser = argparse.ArgumentParser(add_help=False)
 detailsParser.add_argument("--details", default=[], type=str, action="append",
                            choices=['all', 'calendar', 'location', 'length',
                                     'reminders', 'description', 'longurl', 'shorturl',
-                                    'url', 'attendees', 'email', 'attachments'],
+                                    'url', 'attendees', 'email', 'attachments',
+                                    'end'],
                            help="Which parts to display, can be: "
                            "'all', 'calendar', 'location', 'length', "
                            "'reminders', 'description', 'longurl', 'shorturl', "

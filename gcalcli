@@ -1912,7 +1912,7 @@ class gcalcli:
             if self.detailAttendees and 'attendees' in event:
                 attendees = []
                 if 'self' not in event['organizer']:
-                    attendees.add("%s: <%s>" % (
+                    attendees.append("%s: <%s>" % (
                         event['organizer'].get('displayName', 'Not Provided')
                                           .strip(),
                         event['organizer'].get('email', 'Not Provided').strip()
@@ -1920,7 +1920,7 @@ class gcalcli:
 
                 for attendee in event['attendees']:
                     if 'self' not in attendee:
-                        attendees.add("%s: <%s>" % (
+                        attendees.append("%s: <%s>" % (
                             attendee.get('displayName', 'Not Provided').strip(),
                             attendee.get('email', 'Not Provided').strip()
                         ))
@@ -1931,7 +1931,7 @@ class gcalcli:
             if self.detailAttachments and 'attachments' in event:
                 attachments = []
                 for attachment in event['attachments']:
-                    attachments.add("%s (%s)\n" % (
+                    attachments.append("%s (%s)\n" % (
                         attendee.get('title', 'Not Provided').strip(),
                         attendee.get('fileUrl', 'Not Provided').strip()
                     ))
@@ -1948,7 +1948,7 @@ class gcalcli:
                 elif 'overrides' in event['reminders']:
                     reminders = []
                     for rem in event['reminders']['overrides']:
-                        reminders.add("%s %d minutes" % (rem['method'], rem['minutes']))
+                        reminders.append("%s %d minutes" % (rem['method'], rem['minutes']))
                     if reminders:
                         message += "Reminder: %s\n" % ", ".join(reminders)
 

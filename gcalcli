@@ -2049,7 +2049,7 @@ class gcalcli:
 
         if icsFile:
             try:
-                f = file(icsFile)
+                f = icsFile # already opened
             except Exception as e:
                 PrintErrMsg("Error: " + str(e) + "!\n")
                 sys.exit(1)
@@ -2487,7 +2487,7 @@ def BowChickaWowWow():
         gcal.Remind(FLAGS.minutes, FLAGS.cmd, use_reminders=FLAGS.use_reminders)
 
     elif FLAGS.command == 'import':
-        gcal.ImportICS(FLAGS.verbose, FLAGS.dump, FLAGS.reminder, FLAGS.file)
+        gcal.ImportICS(FLAGS.verbose, FLAGS.dump, [], FLAGS.file)
 
 
 def SIGINT_handler(signum, frame):

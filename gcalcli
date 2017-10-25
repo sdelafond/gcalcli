@@ -2057,7 +2057,7 @@ class gcalcli:
         while True:
 
             try:
-                v = vobject.readComponents(f).next()
+                v = next(vobject.readComponents(f))
             except StopIteration:
                 break
 
